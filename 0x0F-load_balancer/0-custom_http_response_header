@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+#Web-01 http response header configuration
+
+#updating packages
+sudo apt-get -y update
+sudo apt-get -y install nginx
+
+#Creating index page
+echo "Hello World!" | sudo tee  /var/www/html/index.html
+
+#Redirection configuration
+string_for_replacement="server_name _;\n\trewrite ^\/redirect_me https:\/\/github.com\/delaney2023 permanent;"
+
+sudo sed -i "s/server_name _;/$string_for_replacement/" /etc/nginx/sites-enabled/default
+
+# Creating 404 error page
+echo "Ceci n'est pas une page" | sudo tee /var/www/html/404.html
+
+# Custom http response header
+sudo sed -i "/server_name _/a add_header X-Served-By $HOSTNAME;" /etc/nginx/sites-enabled/default
+
+# test for errors
+sudo nginx -t
+
+# start nginx
+sudo service nginx restart
