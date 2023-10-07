@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+# Configure my domain zone:
+# www --> 341617-lb-01 54.237.41.178
+# web-01 --> 341617-web-01 54.146.91.194
+# web-02 --> 341617-web-02 54.90.4.143
+
+display_info ()
+{
+    domain="$1"
+    subdomain="$2"
+    dig "$subdomain.$domain" | awk '/ANSWER SECTION:/{getline; printf "The subdomain %s is a %s record and points to %s\n", var, $4, $5}' var="$subdomain"
+}
+
+for subdomain in "www" "lb-01" "web-01" "web-02"
+do
+    if [ -z "$2" ] || [ "$2" == "$subdomain" ] ;
+    then
+	display_info "$1" "$subdomain"
+    fi
+done
